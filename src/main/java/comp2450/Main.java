@@ -1,5 +1,7 @@
 package comp2450;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Main {
     // Pretty print colours
@@ -23,21 +25,24 @@ public class Main {
     public static int playerX;
     public static int playerY;
 
+    // Guards
+    public static ArrayList<Guard> guards = new ArrayList<>();
+
     public static int get_user_selection(int highestValidNumber) {
         int input = -1;
         while (input == -1) {
             try {
                 input = Integer.valueOf(scanner.nextLine());
                 if (input < 1 || input > highestValidNumber) {
-                    System.out.print("Please enter a valid number from 1-" + highestValidNumber + ": ");
+                    System.out.print(PRINT_RED + "Invalid selection. " + PRINT_RESET + "Please enter a valid number from 1-" + highestValidNumber + ": ");
                     input = get_user_selection(highestValidNumber);
                 }
             }
             catch (InputMismatchException ime) {
-                System.out.print("Please enter a valid number from 1-" + highestValidNumber + ": ");
+                System.out.print(PRINT_RED + "Invalid selection. " + PRINT_RESET + "Please enter a valid number from 1-" + highestValidNumber + ": ");
             }
             catch (NumberFormatException nfe) {
-                System.out.print("Please enter a valid number from 1-" + highestValidNumber + ": ");
+                System.out.print(PRINT_RED + "Invalid selection. " + PRINT_RESET + "Please enter a valid number from 1-" + highestValidNumber + ": ");
             }
         }
         return input;
@@ -115,6 +120,7 @@ public class Main {
             mazeHeight = get_user_selection(20);
             Maze maze = new Maze(mazeWidth, mazeHeight);
             mazes.add(maze);
+            System.out.println(PRINT_GREEN + "\nMaze created successfully." + PRINT_RESET);
         }
         if (s == 2) {
             show_maze();
@@ -131,7 +137,7 @@ public class Main {
             text = "The player is not added to the maze yet.";
         }
         else {
-            text = "The player is at position ____.";
+            text = "The player is at position (" + playerX + "," + playerY + ").";
         }
         System.out.println(PRINT_CYAN + "\nPLAYER\n" + PRINT_RESET + text + " You can:");
         if (!playerAdded) {
@@ -159,6 +165,74 @@ public class Main {
             System.out.print("Pick the player's initial Y coordinate (from 1-" + mazeHeight + "): ");
             playerX = get_user_selection(mazeHeight);
             playerAdded = true;
+            System.out.println(PRINT_GREEN + "\nPlayer created successfully." + PRINT_RESET);
+        }
+        else if (s == 2) {
+            System.out.print("Pick the player's new X coordinate (from 1-" + mazeWidth + "): ");
+            playerX = get_user_selection(mazeWidth);
+            System.out.print("Pick the player's new Y coordinate (from 1-" + mazeHeight + "): ");
+            playerX = get_user_selection(mazeHeight);
+            playerAdded = true;
+            System.out.println(PRINT_GREEN + "\nPlayer moved successfully." + PRINT_RESET);
+        }
+        else {
+            playerAdded = false;
+            playerX = -1;
+            playerY = -1;
+            System.out.println(PRINT_GREEN + "\nPlayer removed successfully." + PRINT_RESET);
+        }
+    }
+
+    // GUARD methods
+    public static void print_guard_menu() {
+        String text;
+        if (!playerAdded) {
+            text = "The player is not added to the maze yet.";
+        }
+        else {
+            text = "The player is at position (" + playerX + "," + playerY + ").";
+        }
+        System.out.println(PRINT_CYAN + "\nPLAYER\n" + PRINT_RESET + text + " You can:");
+        if (!playerAdded) {
+            System.out.println("1. Add player");
+        }
+        else {
+            System.out.println("1. Move player");
+            System.out.println("2. Remove player");
+        }
+        System.out.print("Enter a number to make your selection: ");
+    }
+    public static void run_guard_menu() {
+        print_guard_menu();
+        int highestNumber;
+        if (!playerAdded) {
+            highestNumber = 1;
+        }
+        else {
+            highestNumber = 3;
+        }
+        int s = get_user_selection(highestNumber);
+        if (s == 1) {
+            System.out.print("Pick the player's initial X coordinate (from 1-" + mazeWidth + "): ");
+            playerX = get_user_selection(mazeWidth);
+            System.out.print("Pick the player's initial Y coordinate (from 1-" + mazeHeight + "): ");
+            playerX = get_user_selection(mazeHeight);
+            playerAdded = true;
+            System.out.println(PRINT_GREEN + "\nPlayer created successfully." + PRINT_RESET);
+        }
+        else if (s == 2) {
+            System.out.print("Pick the player's new X coordinate (from 1-" + mazeWidth + "): ");
+            playerX = get_user_selection(mazeWidth);
+            System.out.print("Pick the player's new Y coordinate (from 1-" + mazeHeight + "): ");
+            playerX = get_user_selection(mazeHeight);
+            playerAdded = true;
+            System.out.println(PRINT_GREEN + "\nPlayer moved successfully." + PRINT_RESET);
+        }
+        else {
+            playerAdded = false;
+            playerX = -1;
+            playerY = -1;
+            System.out.println(PRINT_GREEN + "\nPlayer removed successfully." + PRINT_RESET);
         }
     }
     
@@ -171,7 +245,16 @@ public class Main {
             run_maze_menu();
         }
         else if (s == 2) {
-            run_player_menu();
+            if (mazes.size() > 0) {
+                run_player_menu();
+            }
+            else {
+                System.out.println(PRINT_RED + "\nThere is nowhere to put the player, please create a maze first." + PRINT_RESET);
+                run_menu();
+            }
+        }
+        else if (s == 3) {
+
         }
         else {
             end_menu = true;
