@@ -12,6 +12,8 @@ date: Fall 2026
 * https://medium.com/@itay.gold/java-record-vs-interface-10fb193c14df
 * https://help.bizzdesign.com/articles/#!horizzon-help/setting-the-aggregation-kind-of-a-uml-association-relationship
 * https://contentlabstudy.com/soft/c-record-methods/
+* https://stackoverflow.com/questions/5762491/how-to-print-color-in-console-using-system-out-println
+* https://www.geeksforgeeks.org/java/how-to-solve-java-lang-classnotfoundexception-in-java/
 
 ## Diagram
 
