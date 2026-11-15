@@ -234,11 +234,14 @@ public class Main {
         print_guard_list();
         System.out.print("Which guard would you like to delete? ");
         int selection = get_user_selection(guards.size());
-        guards.remove(guards.get(selection-1));
+        Guard guard = guards.get(selection-1);
+        guards.remove(guard);
+        coords.get(0).coords[guard.positionY-1][guard.positionX-1] = "□ ";
         System.out.println(PRINT_GREEN + "\nGuard removed successfully." + PRINT_RESET);
     }
     public static void remove_all_guards() {
         while (guards.size() > 0) {
+            coords.get(0).coords[guards.get(0).positionY-1][guards.get(0).positionX-1] = "□ ";
             guards.remove(0);
         }
     }
@@ -259,6 +262,7 @@ public class Main {
             int guardY = get_user_selection(mazeHeight);
             Guard guard = new Guard(guardX, guardY);
             guards.add(guard);
+            coords.get(0).coords[guardY-1][guardX-1] = PRINT_RED + "■ " + PRINT_RESET;
             System.out.println(PRINT_GREEN + "\nGuard created successfully." + PRINT_RESET);
         }
         else if (s == 2) {
@@ -303,11 +307,14 @@ public class Main {
         print_guard_list();
         System.out.print("Which item would you like to delete? ");
         int selection = get_user_selection(items.size());
-        items.remove(items.get(selection-1));
+        Item item = items.get(selection-1);
+        items.remove(item);
+        coords.get(0).coords[item.positionY-1][item.positionX-1] = "□ ";
         System.out.println(PRINT_GREEN + "\nItem removed successfully." + PRINT_RESET);
     }
     public static void remove_all_items() {
         while (items.size() > 0) {
+            coords.get(0).coords[items.get(0).positionY-1][items.get(0).positionX-1] = "□ ";
             items.remove(0);
         }
     }
@@ -327,6 +334,7 @@ public class Main {
             System.out.print("Pick the new item' Y coordinate (from 1-" + mazeHeight + "): ");
             int itemY = get_user_selection(mazeHeight);
             Item item = new Item(itemX, itemY);
+            coords.get(0).coords[itemY-1][itemX-1] = PRINT_YELLOW + "■ " + PRINT_RESET;
             items.add(item);
             System.out.println(PRINT_GREEN + "\nItem created successfully." + PRINT_RESET);
         }
