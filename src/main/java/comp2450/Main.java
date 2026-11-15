@@ -14,6 +14,8 @@ public class Main {
     public static final String PRINT_CYAN = "\u001B[36m";
 
     public static Scanner scanner = new Scanner(System.in);
+    public static ArrayList<Coordinates> coords = new ArrayList<>();
+    public static ArrayList<Item> items = new ArrayList<>();
     
     // Maze
     public static ArrayList<Maze> mazes = new ArrayList<>();
@@ -53,12 +55,12 @@ public class Main {
     }
     public static void print_menu() {
         System.out.println(PRINT_CYAN + "\nMAIN MENU\n" + PRINT_RESET + "These are your options:");
-        System.out.println("1: Edit Mazes");
-        System.out.println("2: Edit Player");
-        System.out.println("3: Edit Guards");
-        System.out.println("4: Edit Items");
-        System.out.println("5: Edit Sets");
-        System.out.println("6: Edit Assignments");
+        System.out.println("1: Mazes");
+        System.out.println("2: Player");
+        System.out.println("3: Guards");
+        System.out.println("4: Items");
+        System.out.println("5: Sets");
+        System.out.println("6: Assignments");
         System.out.print("Enter a number from 1-6 to make your selection: ");
     }
     public static void print_legend() {
@@ -93,9 +95,18 @@ public class Main {
         System.out.println(PRINT_CYAN + "\nMAZES" + PRINT_RESET);
         print_maze_list();
         System.out.print("Which maze would you like to show? ");
-        int selection = get_user_selection(6);
-        Maze m = mazes.get(selection-1);
-        System.out.println(("■  ".repeat(m.width) + "\n").repeat(m.height));
+        int selection = get_user_selection(mazes.size());
+        // Maze m = mazes.get(selection-1);
+        Coordinates c = coords.get(selection-1);
+        // System.out.println(("■ ".repeat(m.width)));
+        // System.out.print(("■ " + "□ ".repeat(m.width-2) + "■\n").repeat(m.height-2));
+        // System.out.println(("■ ".repeat(m.width)));
+        for (int i = 0; i < c.width; i++) {
+            for (int j = 0; j < c.height; j++) {
+                System.out.print(c.coords[i][j]);
+            }
+            System.out.println();
+        }
     }
     public static void remove_maze() {
         System.out.println(PRINT_CYAN + "\nMAZES" + PRINT_RESET);
@@ -103,6 +114,7 @@ public class Main {
         System.out.print("Which maze would you like to delete? ");
         int selection = get_user_selection(mazes.size());
         mazes.remove(mazes.get(selection-1));
+        coords.remove(coords.get(selection-1));
     }
     public static void run_maze_menu() {
         print_maze_menu();
@@ -120,6 +132,8 @@ public class Main {
             mazeHeight = get_user_selection(20);
             Maze maze = new Maze(mazeWidth, mazeHeight);
             mazes.add(maze);
+            Coordinates coord = new Coordinates(maze);
+            coords.add(coord);
             System.out.println(PRINT_GREEN + "\nMaze created successfully." + PRINT_RESET);
         }
         if (s == 2) {
@@ -156,26 +170,30 @@ public class Main {
             highestNumber = 1;
         }
         else {
-            highestNumber = 3;
+            highestNumber = 2;
         }
         int s = get_user_selection(highestNumber);
-        if (s == 1) {
+        if (s == 1 && !playerAdded) {
             System.out.print("Pick the player's initial X coordinate (from 1-" + mazeWidth + "): ");
             playerX = get_user_selection(mazeWidth);
             System.out.print("Pick the player's initial Y coordinate (from 1-" + mazeHeight + "): ");
-            playerX = get_user_selection(mazeHeight);
+            playerY = get_user_selection(mazeHeight);
+            coords.get(0).coords[playerY-1][playerX-1] = PRINT_BLUE + "■ " + PRINT_RESET;
             playerAdded = true;
             System.out.println(PRINT_GREEN + "\nPlayer created successfully." + PRINT_RESET);
         }
-        else if (s == 2) {
+        else if (s == 1 && playerAdded) {
+            coords.get(0).coords[playerY-1][playerX-1] = "□ ";
             System.out.print("Pick the player's new X coordinate (from 1-" + mazeWidth + "): ");
             playerX = get_user_selection(mazeWidth);
             System.out.print("Pick the player's new Y coordinate (from 1-" + mazeHeight + "): ");
-            playerX = get_user_selection(mazeHeight);
+            playerY = get_user_selection(mazeHeight);
+            coords.get(0).coords[playerY-1][playerX-1] = PRINT_BLUE + "■ " + PRINT_RESET;
             playerAdded = true;
             System.out.println(PRINT_GREEN + "\nPlayer moved successfully." + PRINT_RESET);
         }
         else {
+            coords.get(0).coords[playerY-1][playerX-1] = "□ ";
             playerAdded = false;
             playerX = -1;
             playerY = -1;
@@ -186,26 +204,48 @@ public class Main {
     // GUARD methods
     public static void print_guard_menu() {
         String text;
-        if (!playerAdded) {
-            text = "The player is not added to the maze yet.";
+        if (guards.size() == 0) {
+            text = "There are no guards in the maze yet.";
+        }
+        else if (guards.size() == 1) {
+            text = "There is 1 guard in the maze.";
         }
         else {
-            text = "The player is at position (" + playerX + "," + playerY + ").";
+            text = "There are " + guards.size() + " guards in the maze.";
         }
-        System.out.println(PRINT_CYAN + "\nPLAYER\n" + PRINT_RESET + text + " You can:");
-        if (!playerAdded) {
-            System.out.println("1. Add player");
+        System.out.println(PRINT_CYAN + "\nGUARDS\n" + PRINT_RESET + text + " You can:");
+        if (guards.size() == 0) {
+            System.out.println("1. Add a guard");
         }
         else {
-            System.out.println("1. Move player");
-            System.out.println("2. Remove player");
+            System.out.println("1. Add a guard");
+            System.out.println("2. Remove a guard");
+            System.out.println("3. Remove all guards");
         }
         System.out.print("Enter a number to make your selection: ");
     }
-    public static void run_guard_menu() {
+    public static void print_guard_list() {
+        for (int i = 0; i < guards.size(); i++) {
+            System.out.println((i+1) + ": (" + guards.get(i).positionX + "x" + guards.get(i).positionY + ")");
+        }
+    }
+    public static void remove_guard() {
+        System.out.println(PRINT_CYAN + "\nGUARDS" + PRINT_RESET);
+        print_guard_list();
+        System.out.print("Which guard would you like to delete? ");
+        int selection = get_user_selection(guards.size());
+        guards.remove(guards.get(selection-1));
+        System.out.println(PRINT_GREEN + "\nGuard removed successfully." + PRINT_RESET);
+    }
+    public static void remove_all_guards() {
+        while (guards.size() > 0) {
+            guards.remove(0);
+        }
+    }
+    public static void run_guard_menu() { 
         print_guard_menu();
         int highestNumber;
-        if (!playerAdded) {
+        if (guards.size() == 0) {
             highestNumber = 1;
         }
         else {
@@ -213,26 +253,89 @@ public class Main {
         }
         int s = get_user_selection(highestNumber);
         if (s == 1) {
-            System.out.print("Pick the player's initial X coordinate (from 1-" + mazeWidth + "): ");
-            playerX = get_user_selection(mazeWidth);
-            System.out.print("Pick the player's initial Y coordinate (from 1-" + mazeHeight + "): ");
-            playerX = get_user_selection(mazeHeight);
-            playerAdded = true;
-            System.out.println(PRINT_GREEN + "\nPlayer created successfully." + PRINT_RESET);
+            System.out.print("Pick the new guard's X coordinate (from 1-" + mazeWidth + "): ");
+            int guardX = get_user_selection(mazeWidth);
+            System.out.print("Pick the new guard' Y coordinate (from 1-" + mazeHeight + "): ");
+            int guardY = get_user_selection(mazeHeight);
+            Guard guard = new Guard(guardX, guardY);
+            guards.add(guard);
+            System.out.println(PRINT_GREEN + "\nGuard created successfully." + PRINT_RESET);
         }
         else if (s == 2) {
-            System.out.print("Pick the player's new X coordinate (from 1-" + mazeWidth + "): ");
-            playerX = get_user_selection(mazeWidth);
-            System.out.print("Pick the player's new Y coordinate (from 1-" + mazeHeight + "): ");
-            playerX = get_user_selection(mazeHeight);
-            playerAdded = true;
-            System.out.println(PRINT_GREEN + "\nPlayer moved successfully." + PRINT_RESET);
+            remove_guard();
+        }
+        else if (s == 3) {
+            remove_all_guards();
+            System.out.println(PRINT_GREEN + "\nGuards removed successfully." + PRINT_RESET);
+        }
+    }
+
+    // ITEM methods
+    public static void print_item_menu() {
+        String text;
+        if (items.size() == 0) {
+            text = "There are no items in the maze yet.";
+        }
+        else if (guards.size() == 1) {
+            text = "There is 1 item in the maze.";
         }
         else {
-            playerAdded = false;
-            playerX = -1;
-            playerY = -1;
-            System.out.println(PRINT_GREEN + "\nPlayer removed successfully." + PRINT_RESET);
+            text = "There are " + items.size() + " items in the maze.";
+        }
+        System.out.println(PRINT_CYAN + "\nITEMS\n" + PRINT_RESET + text + " You can:");
+        if (items.size() == 0) {
+            System.out.println("1. Add an item");
+        }
+        else {
+            System.out.println("1. Add an item");
+            System.out.println("2. Remove an item");
+            System.out.println("3. Remove all items");
+        }
+        System.out.print("Enter a number to make your selection: ");
+    }
+    public static void print_item_list() {
+        for (int i = 0; i < items.size(); i++) {
+            System.out.println((i+1) + ": (" + items.get(i).positionX + "x" + items.get(i).positionY + ")");
+        }
+    }
+    public static void remove_item() {
+        System.out.println(PRINT_CYAN + "\nITEMS" + PRINT_RESET);
+        print_guard_list();
+        System.out.print("Which item would you like to delete? ");
+        int selection = get_user_selection(items.size());
+        items.remove(items.get(selection-1));
+        System.out.println(PRINT_GREEN + "\nItem removed successfully." + PRINT_RESET);
+    }
+    public static void remove_all_items() {
+        while (items.size() > 0) {
+            items.remove(0);
+        }
+    }
+    public static void run_item_menu() { 
+        print_item_menu();
+        int highestNumber;
+        if (items.size() == 0) {
+            highestNumber = 1;
+        }
+        else {
+            highestNumber = 3;
+        }
+        int s = get_user_selection(highestNumber);
+        if (s == 1) {
+            System.out.print("Pick the new item's X coordinate (from 1-" + mazeWidth + "): ");
+            int itemX = get_user_selection(mazeWidth);
+            System.out.print("Pick the new item' Y coordinate (from 1-" + mazeHeight + "): ");
+            int itemY = get_user_selection(mazeHeight);
+            Item item = new Item(itemX, itemY);
+            items.add(item);
+            System.out.println(PRINT_GREEN + "\nItem created successfully." + PRINT_RESET);
+        }
+        else if (s == 2) {
+            remove_item();
+        }
+        else if (s == 3) {
+            remove_all_items();
+            System.out.println(PRINT_GREEN + "\nItems removed successfully." + PRINT_RESET);
         }
     }
     
@@ -254,7 +357,22 @@ public class Main {
             }
         }
         else if (s == 3) {
-
+            if (mazes.size() > 0) {
+                run_guard_menu();
+            }
+            else {
+                System.out.println(PRINT_RED + "\nThere is nowhere to put the guard, please create a maze first." + PRINT_RESET);
+                run_menu();
+            }
+        }
+        else if (s == 4) {
+            if (mazes.size() > 0) {
+                run_item_menu();
+            }
+            else {
+                System.out.println(PRINT_RED + "\nThere is nowhere to put the item, please create a maze first." + PRINT_RESET);
+                run_menu();
+            }
         }
         else {
             end_menu = true;
