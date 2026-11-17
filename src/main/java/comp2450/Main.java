@@ -1,5 +1,6 @@
 package comp2450;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -16,6 +17,8 @@ public class Main {
     public static Scanner scanner = new Scanner(System.in);
     public static ArrayList<Coordinates> coords = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
+    public static ArrayList<Set> sets = new ArrayList<>();
+    public static ArrayList<Assignment> assignments = new ArrayList<>();
     
     // Maze
     public static ArrayList<Maze> mazes = new ArrayList<>();
@@ -96,11 +99,7 @@ public class Main {
         print_maze_list();
         System.out.print("Which maze would you like to show? ");
         int selection = get_user_selection(mazes.size());
-        // Maze m = mazes.get(selection-1);
         Coordinates c = coords.get(selection-1);
-        // System.out.println(("■ ".repeat(m.width)));
-        // System.out.print(("■ " + "□ ".repeat(m.width-2) + "■\n").repeat(m.height-2));
-        // System.out.println(("■ ".repeat(m.width)));
         for (int i = 0; i < c.width; i++) {
             for (int j = 0; j < c.height; j++) {
                 System.out.print(c.coords[i][j]);
@@ -126,9 +125,9 @@ public class Main {
             s = get_user_selection(1);
         }
         if (s == 1) {
-            System.out.print("How many columns should the maze have? ");
+            System.out.print("How many columns should the maze have (up to 20)? ");
             mazeWidth = get_user_selection(20);
-            System.out.print("How many rows should the maze have? ");
+            System.out.print("How many rows should the maze have (up to 20)? ");
             mazeHeight = get_user_selection(20);
             Maze maze = new Maze(mazeWidth, mazeHeight);
             mazes.add(maze);
@@ -304,7 +303,7 @@ public class Main {
     }
     public static void remove_item() {
         System.out.println(PRINT_CYAN + "\nITEMS" + PRINT_RESET);
-        print_guard_list();
+        print_item_list();
         System.out.print("Which item would you like to delete? ");
         int selection = get_user_selection(items.size());
         Item item = items.get(selection-1);
@@ -346,6 +345,122 @@ public class Main {
             System.out.println(PRINT_GREEN + "\nItems removed successfully." + PRINT_RESET);
         }
     }
+
+    // SET methods
+    public static void print_set_menu() {
+        System.out.println(PRINT_CYAN + "\nSETS\n" + PRINT_RESET + "There are " + sets.size() + " sets. You can:");
+        if (sets.size() == 0) {
+            System.out.println("1. Add a set");
+        }
+        else {
+            System.out.println("1. Add a set");
+            System.out.println("2. Remove a set");
+            System.out.println("3. Remove all assignments in a set");
+        }
+        System.out.print("Enter a number to make your selection: ");
+    }
+    public static void print_set_list() {
+        for (int i = 0; i < sets.size(); i++) {
+            System.out.println((i+1) + ": " + sets.get(i).name);
+        }
+    }
+    public static void remove_set() {
+        System.out.println(PRINT_CYAN + "\nSETS" + PRINT_RESET);
+        print_set_list();
+        System.out.print("Which set would you like to delete? ");
+        int selection = get_user_selection(sets.size());
+        Set set = sets.get(selection-1);
+        sets.remove(set);
+        System.out.println(PRINT_GREEN + "\nSet removed successfully." + PRINT_RESET);
+    }
+    public static void remove_all_in_set() {
+        System.out.println(PRINT_CYAN + "\nSETS" + PRINT_RESET);
+        print_set_list();
+        System.out.print("Which set would you like to remove all assignments from? ");
+        int selection = get_user_selection(sets.size());
+        Set set = sets.get(selection-1);
+        while (set.assignments.size() > 0) {
+            set.assignments.remove(0);
+        }
+    }
+    public static void run_set_menu() {
+        print_set_menu();
+        int highestNumber;
+        if (sets.size() == 0) {
+            highestNumber = 1;
+        }
+        else {
+            highestNumber = 3;
+        }
+        int s = get_user_selection(highestNumber);
+        if (s == 1) {
+            System.out.print("What would you like to name the set? ");
+            String name = scanner.nextLine();
+            Set set = new Set(name);
+            sets.add(set);
+            System.out.println(PRINT_GREEN + "\nSet created successfully." + PRINT_RESET);
+        }
+        else if (s == 2) {
+            remove_set();
+        }
+        else if (s == 3) {
+            remove_all_in_set();
+            System.out.println(PRINT_GREEN + "\nAll assignments in set removed successfully." + PRINT_RESET);
+        }
+    }
+
+    // ASSIGNMENT methods
+    public static void print_assignment_menu() {
+        System.out.println(PRINT_CYAN + "\nASSIGNMENTS\n" + PRINT_RESET + "There are " + assignments.size() + " assignments. You can:");
+        if (assignments.size() == 0) {
+            System.out.println("1. Add an assignment");
+        }
+        else {
+            System.out.println("1. Add an assignment");
+            System.out.println("2. Remove an assignment");
+        }
+        System.out.print("Enter a number to make your selection: ");
+    }
+    public static void print_assignment_list() {
+        for (int i = 0; i < assignments.size(); i++) {
+            System.out.println((i+1) + ": " + assignments.get(i).name);
+        }
+    }
+    public static void remove_assignment() {
+        System.out.println(PRINT_CYAN + "\nASSIGNMENTS" + PRINT_RESET);
+        print_assignment_list();
+        System.out.print("Which assignment would you like to delete? ");
+        int selection = get_user_selection(assignments.size());
+        Assignment assignment = assignments.get(selection-1);
+        assignments.remove(assignment);
+        System.out.println(PRINT_GREEN + "\nAssignment removed successfully." + PRINT_RESET);
+    }
+    public static void run_assignment_menu() {
+        print_assignment_menu();
+        int highestNumber;
+        if (assignments.size() == 0) {
+            highestNumber = 1;
+        }
+        else {
+            highestNumber = 2;
+        }
+        int s = get_user_selection(highestNumber);
+        if (s == 1) {
+            System.out.print("What would you like to name the assignment? ");
+            String name = scanner.nextLine();
+            System.out.println(PRINT_CYAN + "\nSETS" + PRINT_RESET);
+            print_set_list();
+            System.out.print("Which set would you like to add this assignment to? ");
+            int selection = get_user_selection(sets.size());
+            Set set = sets.get(selection-1);
+            Assignment assignment = new Assignment(set, name);
+            set.assignments.add(assignment);
+            System.out.println(PRINT_GREEN + "\nAssignment created successfully." + PRINT_RESET);
+        }
+        else if (s == 2) {
+            remove_assignment();
+        }
+    }
     
     public static void run_menu() {
         boolean end_menu = false;
@@ -379,6 +494,18 @@ public class Main {
             }
             else {
                 System.out.println(PRINT_RED + "\nThere is nowhere to put the item, please create a maze first." + PRINT_RESET);
+                run_menu();
+            }
+        }
+        else if (s == 5) {
+            run_set_menu();
+        }
+        else if (s == 6) {
+            if (sets.size() > 0) {
+                run_assignment_menu();
+            }
+            else {
+                System.out.println(PRINT_RED + "\nThere are no sets to add this assignment to. Please add a set first." + PRINT_RESET);
                 run_menu();
             }
         }
